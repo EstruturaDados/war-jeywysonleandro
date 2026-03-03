@@ -44,7 +44,10 @@ int main() {
     struct Territorio territorios[5]; // Mapa do mundo com 5 territórios
     {
     };
-    
+   for (int i = 0; i < 5; i++) {
+    printf("Digite o nome do território %d: ", i + 1);
+    scanf("%s", territorios[i].nome);
+}
     // 1. Configuração Inicial (Setup):
     // - Define o locale para português.
     // - Inicializa a semente para geração de números aleatórios com base no tempo atual.
