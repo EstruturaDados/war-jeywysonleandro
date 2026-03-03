@@ -24,6 +24,12 @@
 
 // --- Estrutura de Dados ---
 // Define a estrutura para um território, contendo seu nome, a cor do exército que o domina e o número de tropas.
+struct Territorio {
+    char nome[20];       // Nome do território (máximo de 19 caracteres + terminador nulo)
+    char cor[20]; // Cor do exército que domina o território (máximo de 19 caracteres + terminador nulo)
+    int tropas;     // Número de tropas presentes no território
+};
+
 
 // --- Protótipos das Funções ---
 // Declarações antecipadas de todas as funções que serão usadas no programa, organizadas por categoria.
