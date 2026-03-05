@@ -2,99 +2,120 @@
 #include <stdlib.h>
 #include <time.h>
 
-/* ===============================
-   Estrutura do Territorio
-   =============================== */
-struct Territorio {
-    char nome[20];
+#define TOTAL_TERRITORIOS 4
+
+// Estrutura do território
+typedef struct {
+    char nome[30];
     char cor[20];
     int tropas;
-};
+} Territorio;
 
-/* ===============================
-   Função de batalha
-   =============================== */
-void batalhar(struct Territorio *territorios, int atacante, int defensor) {
+// ------------------- FUNÇÃO MOSTRAR MAPA -------------------
+void mostrarMapa(const Territorio t[]) {
+    printf("\n===== MAPA =====\n");
 
-    int dadoAtaque = rand() % 6 + 1;   // Número de 1 a 6
-    int dadoDefesa = rand() % 6 + 1;
-
-    printf("\n--- BATALHA ---\n");
-    printf("Atacante rolou: %d\n", dadoAtaque);
-    printf("Defensor rolou: %d\n", dadoDefesa);
-
-    if (dadoAtaque >= dadoDefesa) {
-        printf("Atacante venceu a rodada!\n");
-        territorios[defensor].tropas--;
-
-        if (territorios[defensor].tropas <= 0) {
-            printf("Territorio conquistado!\n");
-            territorios[defensor].tropas = 1;
-        }
-
-    } else {
-        printf("Defensor venceu a rodada!\n");
-        territorios[atacante].tropas--;
+    for(int i = 0; i < TOTAL_TERRITORIOS; i++) {
+        printf("Territorio %d\n", i + 1);
+        printf("Nome: %s\n", t[i].nome);
+        printf("Cor: %s\n", t[i].cor);
+        printf("Tropas: %d\n\n", t[i].tropas);
     }
 }
 
-/* ===============================
-   Função principal
-   =============================== */
+// ------------------- FUNÇÃO ATACAR -------------------
+void atacar(Territorio t[]) {
+    int origem, destino;
+
+    printf("Escolha o territorio de ataque (1-4): ");
+    scanf("%d", &origem);
+
+    printf("Escolha o territorio a ser atacado (1-4): ");
+    scanf("%d", &destino);
+
+    origem--;
+    destino--;
+
+    if(t[origem].tropas > t[destino].tropas) {
+        printf("Vitoria!\n");
+        t[destino].tropas = t[origem].tropas - 1;
+        t[destino].cor[0] = '\0';
+        strcpy(t[destino].cor, t[origem].cor);
+    } else {
+        printf("Derrota!\n");
+        t[origem].tropas = 1;
+    }
+}
+
+// ------------------- FUNÇÃO VERIFICAR MISSÃO -------------------
+void verificarMissao(const Territorio t[], int missao) {
+
+    int contador = 0;
+
+    if(missao == 1) {
+        for(int i = 0; i < TOTAL_TERRITORIOS; i++) {
+            if(strcmp(t[i].cor, "Verde") != 0) {
+                contador++;
+            }
+        }
+
+        if(contador == TOTAL_TERRITORIOS) {
+            printf("Missao cumprida! Exército Verde destruido!\n");
+        } else {
+            printf("Missao ainda nao concluida.\n");
+        }
+
+    } else {
+        for(int i = 0; i < TOTAL_TERRITORIOS; i++) {
+            if(strcmp(t[i].cor, "Azul") == 0) {
+                contador++;
+            }
+        }
+
+        if(contador >= 3) {
+            printf("Missao cumprida! 3 territorios conquistados!\n");
+        } else {
+            printf("Missao ainda nao concluida.\n");
+        }
+    }
+}
+
+// ------------------- MAIN -------------------
 int main() {
 
-    srand(time(NULL)); // Inicializa aleatoriedade
+    srand(time(NULL));
 
-    struct Territorio *territorios;
-    territorios = calloc(5, sizeof(struct Territorio));
+    Territorio territorios[TOTAL_TERRITORIOS] = {
+        {"Brasil", "Azul", 10},
+        {"Argentina", "Verde", 8},
+        {"Chile", "Verde", 6},
+        {"Uruguai", "Azul", 5}
+    };
 
-    if (territorios == NULL) {
-        printf("Erro de alocacao de memoria!\n");
-        return 1;
-    }
+    int missao = rand() % 2 + 1;
+    int opcao;
 
-    /* Cadastro */
-    for (int i = 0; i < 5; i++) {
+    do {
+        mostrarMapa(territorios);
 
-        printf("\nTerritorio %d\n", i + 1);
+        printf("1 - Atacar\n");
+        printf("2 - Verificar Missao\n");
+        printf("0 - Sair\n");
+        printf("Escolha: ");
+        scanf("%d", &opcao);
 
-        printf("Nome: ");
-        scanf("%s", territorios[i].nome);
+        switch(opcao) {
+            case 1:
+                atacar(territorios);
+                break;
+            case 2:
+                verificarMissao(territorios, missao);
+                break;
+        }
 
-        printf("Cor do exercito: ");
-        scanf("%s", territorios[i].cor);
+    } while(opcao != 0);
 
-        printf("Numero de tropas: ");
-        scanf("%d", &territorios[i].tropas);
-    }
-
-    int atacante, defensor;
-
-    /* Fase de batalha */
-    printf("\n=== FASE DE ATAQUE ===\n");
-
-    printf("Escolha territorio atacante (1-5): ");
-    scanf("%d", &atacante);
-
-    printf("Escolha territorio defensor (1-5): ");
-    scanf("%d", &defensor);
-
-    atacante--; // Ajuste para índice do vetor
-    defensor--;
-
-    batalhar(territorios, atacante, defensor);
-
-    /* Exibir mapa atualizado */
-    printf("\n=== MAPA ATUALIZADO ===\n");
-
-    for (int i = 0; i < 5; i++) {
-        printf("\nTerritorio %d\n", i + 1);
-        printf("Nome: %s\n", territorios[i].nome);
-        printf("Cor: %s\n", territorios[i].cor);
-        printf("Tropas: %d\n", territorios[i].tropas);
-    }
-
-    free(territorios); // Libera memória
+    printf("Jogo encerrado.\n");
 
     return 0;
 }
