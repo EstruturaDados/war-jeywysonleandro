@@ -1,198 +1,48 @@
-// ================= BIBLIOTECAS =================
-
-// Biblioteca para usar printf e scanf
 #include <stdio.h>
-
-// Biblioteca para usar rand() e srand()
-#include <stdlib.h>
-
-// Biblioteca para usar time()
-#include <time.h>
-
-// Biblioteca para usar strcmp() e strcpy()
 #include <string.h>
 
+#define TOTAL_TERRITORIOS 5
 
-// ================= CONSTANTE =================
-
-// Define uma constante chamada TOTAL_TERRITORIOS com valor 4
-// Isso evita usar número "solto" no código
-#define TOTAL_TERRITORIOS 4
-
-
-// ================= STRUCT =================
-
-// Criamos um novo tipo chamado Territorio
-// Ele funciona como um molde
-typedef struct {
-
-    char nome[30];   // Guarda o nome do território (texto)
-    char cor[20];    // Guarda a cor do exército (texto)
-    int tropas;      // Guarda a quantidade de tropas (número inteiro)
-
-} Territorio; // Finalizamos a struct
-
-
-// ================= FUNÇÃO MOSTRAR MAPA =================
-
-// const significa que essa função NÃO pode alterar os dados
-void mostrarMapa(const Territorio t[]) {
-
-    printf("\n===== MAPA =====\n"); // Mostra título
-
-    // Laço for para percorrer todos os territórios
-    for(int i = 0; i < TOTAL_TERRITORIOS; i++) {
-
-        printf("Territorio %d\n", i + 1); // Mostra número do território
-
-        printf("Nome: %s\n", t[i].nome); // %s é usado para texto
-
-        printf("Cor: %s\n", t[i].cor);   // Mostra a cor
-
-        printf("Tropas: %d\n\n", t[i].tropas); // %d é usado para número inteiro
-    }
-}
-
-
-// ================= FUNÇÃO ATACAR =================
-
-// Aqui NÃO usamos const porque vamos alterar os dados
-void atacar(Territorio t[]) {
-
-    int origem;   // Variável para guardar território atacante
-    int destino;  // Variável para guardar território atacado
-
-    printf("Escolha o territorio de ataque (1-4): ");
-    scanf("%d", &origem); // Lê número digitado
-
-    printf("Escolha o territorio a ser atacado (1-4): ");
-    scanf("%d", &destino); // Lê número digitado
-
-    origem--;  // Ajusta para índice do vetor (vetor começa em 0)
-    destino--; // Ajusta para índice do vetor
-
-    // Verifica se o atacante tem mais tropas
-    if(t[origem].tropas > t[destino].tropas) {
-
-        printf("Vitoria!\n");
-
-        // O território conquistado recebe as tropas
-        t[destino].tropas = t[origem].tropas - 1;
-
-        // Copia a cor do atacante para o conquistado
-        strcpy(t[destino].cor, t[origem].cor);
-
-    } else {
-
-        printf("Derrota!\n");
-
-        // Se perder, o território atacante fica com 1 tropa
-        t[origem].tropas = 1;
-    }
-}
-
-
-// ================= FUNÇÃO VERIFICAR MISSÃO =================
-
-// Recebe os territórios e o número da missão
-void verificarMissao(const Territorio t[], int missao) {
-
-    int contador = 0; // Conta territórios conquistados
-
-    // Se a missão for 1
-    if(missao == 1) {
-
-        // Percorre todos os territórios
-        for(int i = 0; i < TOTAL_TERRITORIOS; i++) {
-
-            // strcmp compara textos
-            // Se for diferente de Verde
-            if(strcmp(t[i].cor, "Verde") != 0) {
-
-                contador++; // Soma 1
-            }
-        }
-
-        // Se nenhum território for Verde
-        if(contador == TOTAL_TERRITORIOS) {
-
-            printf("Missao cumprida! Exército Verde destruido!\n");
-
-        } else {
-
-            printf("Missao ainda nao concluida.\n");
-        }
-
-    } 
-    else { // Missão 2
-
-        for(int i = 0; i < TOTAL_TERRITORIOS; i++) {
-
-            // Se a cor for Azul
-            if(strcmp(t[i].cor, "Azul") == 0) {
-
-                contador++; // Soma 1
-            }
-        }
-
-        // Se tiver 3 ou mais territórios Azuis
-        if(contador >= 3) {
-
-            printf("Missao cumprida! 3 territorios conquistados!\n");
-
-        } else {
-
-            printf("Missao ainda nao concluida.\n");
-        }
-    }
-}
-
-
-// ================= FUNÇÃO PRINCIPAL =================
+// Criando a struct
+struct Territorio {
+    char nome[50];
+    char cor[20];
+    int tropas;
+};
 
 int main() {
 
-    srand(time(NULL)); // Inicializa números aleatórios
+    struct Territorio territorios[TOTAL_TERRITORIOS];
 
-    // Criando vetor de territórios já preenchido
-    Territorio territorios[TOTAL_TERRITORIOS] = {
+    // Cadastro dos territórios
+    for(int i = 0; i < TOTAL_TERRITORIOS; i++) {
 
-        {"Brasil", "Azul", 10},
-        {"Argentina", "Verde", 8},
-        {"Chile", "Verde", 6},
-        {"Uruguai", "Azul", 5}
-    };
+        printf("\n--- Cadastro do Território %d ---\n", i + 1);
 
-    int missao = rand() % 2 + 1; // Gera missão 1 ou 2
+        printf("Nome do território: ");
+        fgets(territorios[i].nome, 50, stdin);
+        territorios[i].nome[strcspn(territorios[i].nome, "\n")] = '\0';
 
-    int opcao; // Guarda escolha do menu
+        printf("Cor do exército: ");
+        fgets(territorios[i].cor, 20, stdin);
+        territorios[i].cor[strcspn(territorios[i].cor, "\n")] = '\0';
 
-    // Loop do menu
-    do {
+        printf("Número de tropas: ");
+        scanf("%d", &territorios[i].tropas);
+        getchar(); // limpa o enter do buffer
+    }
 
-        mostrarMapa(territorios); // Mostra mapa
+    // Exibição do mapa
+    printf("\n====== MAPA ATUAL ======\n");
 
-        printf("1 - Atacar\n");
-        printf("2 - Verificar Missao\n");
-        printf("0 - Sair\n");
-        printf("Escolha: ");
+    for(int i = 0; i < TOTAL_TERRITORIOS; i++) {
 
-        scanf("%d", &opcao); // Lê opção
+        printf("\nTerritório %d\n", i + 1);
+        printf("Nome: %s\n", territorios[i].nome);
+        printf("Cor do Exército: %s\n", territorios[i].cor);
+        printf("Tropas: %d\n", territorios[i].tropas);
 
-        switch(opcao) {
+    }
 
-            case 1:
-                atacar(territorios); // Chama função atacar
-                break;
-
-            case 2:
-                verificarMissao(territorios, missao); // Verifica missão
-                break;
-        }
-
-    } while(opcao != 0); // Repete até digitar 0
-
-    printf("Jogo encerrado.\n");
-
-    return 0; // Finaliza programa
+    return 0;
 }
